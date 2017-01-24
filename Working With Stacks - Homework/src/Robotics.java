@@ -1,158 +1,155 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.*;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class Robotics {
-    public static void main(String[] args) {
-        BufferedReader Console = new BufferedReader(new InputStreamReader(System.in));
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        /*
-            INPUT
-            ROB-15;SS2-10;NX8000-3
-            8:00:00
-            detail
-            glass
-            wood
-            apple
-            End
-         */
+        ArrayDeque<String> productsQueue = new ArrayDeque<>();
 
+        StringTokenizer inputTokenizer = new StringTokenizer(reader.readLine(), ";");
+        String startTime = reader.readLine();
 
-        try {
-            //Get robots and Inicialize the time
-            String[] robotsInfo = Console.readLine().split(";");
-            Integer[] time = Arrays.stream(Console.readLine().split(":"))
-                    .map(Integer::parseInt)
-                    .toArray(Integer[]::new);
-            LocalTime StartTime = LocalTime.of(time[0], time[1], time[2]);
+        Robot[] robotsLine = new Robot[inputTokenizer.countTokens()];
 
-            //Inicialize array of Robot objects
-            ArrayList<Robot> robots = new ArrayList<>();
+        int robotInd = 0;
+        while (inputTokenizer.hasMoreTokens()) {
+            StringTokenizer robotTokenizer = new StringTokenizer(inputTokenizer.nextToken(), "-");
 
-            //Inicialize the que
-            for (int i = 0; i < robotsInfo.length; i++) {
-                String robot = robotsInfo[i];
-                String[] nameAndNeededTime = robot.split("-");
-                Integer[] secondsMinutesHours = convertToSecondsMinutesHours(nameAndNeededTime[1]);
-                LocalTime neededTime = LocalTime.of(secondsMinutesHours[2],
-                        secondsMinutesHours[1],
-                        secondsMinutesHours[0]);
-                Robot a = new Robot(nameAndNeededTime[0], neededTime, StartTime);
-                robots.add(a);
-            }
+            while (robotTokenizer.hasMoreTokens()) {
+                String name = robotTokenizer.nextToken();
+                int processingTime = Integer.valueOf(robotTokenizer.nextToken());
 
-            ArrayDeque<String> objectsToProcess = new ArrayDeque<>();
-            String obj = Console.readLine();
-            while (!obj.equals("End")) {
-                objectsToProcess.addLast(obj);
-                obj = Console.readLine();
-            }
-
-            //Do the thIng ;)
-            while (objectsToProcess.size() > 0) {
-                StartTime = StartTime.plusSeconds(1);
-                String object = objectsToProcess.removeFirst();
-                boolean freeRobot = false;
-                for (int i = 0; i < robots.size(); i++) {
-                    if (robots.get(i).isFree(StartTime)) {
-                        robots.get(i).setCurrentTime(StartTime);
-                        freeRobot = true;
-                        System.out.printf("%s - %s [%s]\n", robots.get(i).getName(), object, printDate(StartTime));
-                        break;
-                    }
-                }
-
-                if (!freeRobot) {
-                    objectsToProcess.addLast(object);
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static Integer[] convertToSecondsMinutesHours (String time){
-        Integer parsedTime = Integer.parseInt(time);
-        Integer seconds = parsedTime % 60;
-        Integer minutes = (parsedTime/60)%60;
-        Integer hours = parsedTime/3600;
-        return new Integer[]{seconds, minutes, hours};
-    }
-
-
-    /*
-    Implementing my own LocalTime .toString()
-     */
-    public static String printDate(LocalTime date) {
-        StringBuilder buf = new StringBuilder(18);
-        int hourValue = date.getHour();
-        int minuteValue = date.getMinute();
-        int secondValue = date.getSecond();
-        int nanoValue = date.getNano();
-        buf.append(hourValue < 10 ? "0" : "").append(hourValue)
-                .append(minuteValue < 10 ? ":0" : ":").append(minuteValue);
-        if (secondValue >= 0 || nanoValue > 0) {
-            buf.append(secondValue < 10 ? ":0" : ":").append(secondValue);
-            if (nanoValue > 0) {
-                buf.append('.');
-                if (nanoValue % 1000_000 == 0) {
-                    buf.append(Integer.toString((nanoValue / 1000_000) + 1000).substring(1));
-                } else if (nanoValue % 1000 == 0) {
-                    buf.append(Integer.toString((nanoValue / 1000) + 1000_000).substring(1));
-                } else {
-                    buf.append(Integer.toString((nanoValue) + 1000_000_000).substring(1));
-                }
+                Robot newRobot = new Robot(name, processingTime, startTime);
+                robotsLine[robotInd] = newRobot;
+                robotInd += 1;
             }
         }
-        return buf.toString();
+
+        // Enqueue products
+        String productInput = reader.readLine();
+        while (!productInput.equals("End")) {
+            productsQueue.offer(productInput);
+            productInput = reader.readLine();
+        }
+
+        // Start time-lapse
+        while (!productsQueue.isEmpty()) {
+            boolean productTaken = false;
+
+            for (Robot robot : robotsLine) {
+                robot.updateStatus();
+
+                if (!robot.busy() && !productTaken) {
+                    robot.takeProduct(productsQueue.poll());
+                    productTaken = true;
+                }
+            }
+
+            if (!productTaken) {
+                String toBack = productsQueue.poll();
+                productsQueue.offer(toBack);
+            }
+        }
     }
 }
 
 class Robot {
-    private String name = "";
-    private LocalTime neededTime;
-    private LocalTime timeToFree;
-    private LocalTime currentTime;
+    private int processingTime;
+    private String name;
+    private boolean isBusy;
+    private SimpleClock robotClock;
+    private SimpleClock endTime;
 
-    public Robot(String name, LocalTime neededTime, LocalTime currentTime) {
+    public Robot(String name, int processingTime, String currentTime) {
         this.name = name;
-        this.neededTime = neededTime;
-        this.currentTime = currentTime;
+        if(processingTime == 0 )
+            this.processingTime = processingTime + 1;
+        else this.processingTime = processingTime;
+        this.robotClock = new SimpleClock(currentTime);
+        this.isBusy = false;
     }
 
-    public String getName() {
-        return name;
+    public void takeProduct(String product) {
+        if (this.isBusy) {
+            return;
+        }
+        System.out.printf("%s - %s %s", this.name, product, this.robotClock.getTime());
+        System.out.println();
+        this.endTime = new SimpleClock(this.robotClock);
+        this.endTime.addSeconds(this.processingTime);
+        this.isBusy = true;
     }
 
-    public void setCurrentTime(LocalTime currentTime) {
-        /*
-        Calculate needed time to so the robot can be free
-        */
-        this.currentTime = currentTime;
-        Long neededTimeAsNanoOfDay = neededTime.toNanoOfDay();
-        Long currenTimeAsNanoOfDay = currentTime.toNanoOfDay();
+    public void updateStatus() {
+        this.robotClock.tick();
 
-        this.timeToFree = LocalTime.ofNanoOfDay(neededTimeAsNanoOfDay + currenTimeAsNanoOfDay);
+        if (this.busy()) {
+            if (this.robotClock.equals(this.endTime)) {
+                this.isBusy = false;
+            }
+        }
     }
 
-    public LocalTime getTimeToFree() {
-        return timeToFree;
+    public boolean busy() {
+        return this.isBusy;
+    }
+}
+
+class SimpleClock {
+    private byte hours;
+    private byte minutes;
+    private byte seconds;
+
+    public SimpleClock(String startTime) {
+        StringTokenizer clockTokenizer = new StringTokenizer(startTime, ":");
+
+        this.hours = Byte.valueOf(clockTokenizer.nextToken());
+        this.minutes = Byte.valueOf(clockTokenizer.nextToken());
+        this.seconds = Byte.valueOf(clockTokenizer.nextToken());
     }
 
-    public Boolean isFree(LocalTime currentTime) {
-        if(this.timeToFree == null) return  true;
-        int comp = currentTime.compareTo(this.timeToFree);
+    public SimpleClock(SimpleClock otherClock) {
+        this.hours = otherClock.hours;
+        this.minutes = otherClock.minutes;
+        this.seconds = otherClock.seconds;
+    }
 
-        if(comp == -1)
-            return false;
-        else if(comp == 0)
-            return true;
-        else
-            return true;
+    public boolean equals(SimpleClock otherClock) {
+        return ((this.hours == otherClock.hours)
+                && (this.minutes == otherClock.minutes)
+                && (this.seconds == otherClock.seconds));
+    }
+
+    public void tick() {
+        this.seconds += 1;
+        if (this.seconds == 60) {
+            this.seconds = 0;
+            this.minutes += 1;
+        }
+        if (this.minutes == 60) {
+            this.minutes = 0;
+            this.hours += 1;
+        }
+        if (this.hours == 24) {
+            this.hours = 0;
+        }
+    }
+
+    public String getTime() {
+        String seconds = this.seconds < 10 ? ("0" + this.seconds) : String.valueOf(this.seconds);
+        String minutes = this.minutes < 10 ? ("0" + this.minutes) : String.valueOf(this.minutes);
+        String hours = this.hours < 10 ? ("0" + this.hours) : String.valueOf(this.hours);
+
+        return String.format("[%s:%s:%s]", hours, minutes, seconds);
+    }
+
+    public void addSeconds(int seconds) {
+        for (int i = 0; i < seconds; i++) {
+            this.tick();
+        }
     }
 }

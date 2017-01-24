@@ -21,7 +21,7 @@ public class MathPotato {
                 }
 
                 if(isPrime(cycle)) {
-                    System.out.println("Prime is " + queue.getFirst());
+                    System.out.println("Prime " + queue.getFirst());
                 } else {
                     System.out.println("Removed " + queue.removeFirst());
                 }
