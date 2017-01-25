@@ -11,11 +11,7 @@ public class SetsofElements {
         LinkedHashSet<String> names = new LinkedHashSet<>();
         try {
             Integer n = Integer.parseInt(Console.readLine());
-            for (int i = 0; i < n; i++) {
-                names.add(Console.readLine());
-            }
-
-            names.forEach(System.out::println);
+            Integer m = Integer.parseInt(Console.readLine());
         } catch (IOException e) {
             e.printStackTrace();
         }
