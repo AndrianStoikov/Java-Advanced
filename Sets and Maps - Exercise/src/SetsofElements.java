@@ -13,7 +13,7 @@ public class SetsofElements {
             Integer n = Integer.parseInt(Console.readLine());
             Integer m = Integer.parseInt(Console.readLine());
             for (int i = 0; i < n; i++) {
-
+                Console.readLine();
             }
         } catch (IOException e) {
             e.printStackTrace();
