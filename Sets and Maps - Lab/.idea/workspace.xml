@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="45127086-2828-4e8e-a407-b621ca7c2334" name="Default" comment="Solution 100/100">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/CountValues.java" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/VoinaGame.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Sets and Maps - Lab/SoftuniParty.class" afterPath="$PROJECT_DIR$/out/production/Sets and Maps - Lab/SoftuniParty.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -620,7 +618,7 @@
       <updated>1485195776030</updated>
       <workItem from="1485195788028" duration="3749000" />
       <workItem from="1485289953814" duration="3034000" />
-      <workItem from="1485366892034" duration="5561000" />
+      <workItem from="1485366892034" duration="5613000" />
     </task>
     <task id="LOCAL-00001" summary="Solution 100/100">
       <created>1485367919947</created>
@@ -629,11 +627,18 @@
       <option name="project" value="LOCAL" />
       <updated>1485367919947</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Solution 100/100">
+      <created>1485372651087</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1485372651088</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="12344000" />
+    <option name="totallyTimeSpent" value="12396000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-4" y="-4" width="1288" height="988" extended-state="0" />
