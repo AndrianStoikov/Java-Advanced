@@ -1,58 +1,55 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
+
+import java.util.Scanner;
+import java.util.TreeSet;
 
 public class SoftuniParty {
     public static void main(String[] args) {
-        HashMap<String, String> vipList = new HashMap<String, String>();
-        HashMap<String, String> normalGuestList = new HashMap<String, String>();
-        BufferedReader Console = new BufferedReader(new InputStreamReader(System.in));
+        HashSet<String> vip = new HashSet<>();
+        TreeSet<String> regular = new TreeSet<>();
+        //try {
+            Scanner sc = new Scanner(System.in);
 
-        try {
             while (true) {
-                String guest = Console.readLine();
-                if(guest.equals("PARTY")) {
+                String input = sc.nextLine();
+                if (input.equals("PARTY")) {
                     break;
-                } else {
-                    char first = guest.charAt(0);
-                    if(first >= 48 && first <= 57) {
-                        vipList.put(guest, guest);
+                }else {
+                    char sign = input.charAt(0);
+                    if (sign >= 48 && sign <= 57) {
+                        vip.add(input);
                     } else {
-                        normalGuestList.put(guest, guest);
+                        regular.add(input);
                     }
                 }
             }
 
-            while (true) {
-                String guest = Console.readLine();
-                if(guest.equals("END")) {
+
+            while(true) {
+                String input = sc.nextLine();
+                if (input.equals("END")) {
                     break;
-                } else {
-                    if(vipList.containsKey(guest)) {
-                        vipList.remove(guest);
-                    } else {
-                        normalGuestList.remove(guest);
+                }else {
+                    if(vip.contains(input)) {
+                        vip.remove(input);
+                    } else if(regular.contains(input)) {
+                        regular.remove(input);
                     }
                 }
             }
 
-            StringBuilder sb = new StringBuilder();
 
-            for (String s : vipList.keySet()) {
-                sb.append(s);
-                sb.append("\n");
-            }
+            regular.addAll(vip);
 
-            for (String s : normalGuestList.keySet()) {
-                sb.append(s);
-                sb.append("\n");
-            }
-
-            System.out.println(vipList.size() + normalGuestList.size() + "\n" + sb.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
+        System.out.println(regular.size());
+        for (String s : regular) {
+            System.out.println(s);
         }
+        //} //catch (IOException e) {
+          //  e.printStackTrace();
+        //}
     }
 }
